@@ -32,10 +32,12 @@ Build the server, which receives remote requests and runs the prover:
 go build -o bin/server ./server
 ```
 
+Omit `--server` for local proving; specify `--server HOST:PORT` for remote proving.
+
 To try a local run, generate a Groth16 proof for the Cubic circuit over BN254 using the sample inputs. Without `--setup-name`, the prover creates a fresh setup:
 
 ```bash
-./bin/client --mode local --circuit cubic --backend groth16 --curve bn254 \
+./bin/client --circuit cubic --backend groth16 --curve bn254 \
   --inputs client/inputs/cubic/000001.json
 ```
 
@@ -48,7 +50,7 @@ To try remote proving on the same machine, start the server:
 Then send the same proving request from another terminal:
 
 ```bash
-./bin/client --mode remote --server 127.0.0.1:9000 \
+./bin/client --server 127.0.0.1:9000 \
   --circuit cubic --backend groth16 --curve bn254 \
   --inputs client/inputs/cubic/000001.json
 ```

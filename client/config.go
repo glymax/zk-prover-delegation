@@ -9,7 +9,6 @@ import (
 )
 
 type Config struct {
-	Mode,
 	Server,
 	Circuit,
 	Backend,
@@ -23,8 +22,7 @@ func parseConfig(args []string) (Config, error) {
 	var config Config
 	fs := flag.NewFlagSet("client", flag.ContinueOnError)
 
-	fs.StringVar(&config.Mode, "mode", "", "local or remote")
-	fs.StringVar(&config.Server, "server", "", "server address")
+	fs.StringVar(&config.Server, "server", "", "server address; omit for local proving")
 	fs.StringVar(&config.Circuit, "circuit", "", "built-in circuit ID (local or remote)")
 	fs.StringVar(&config.Backend, "backend", "", "prove system")
 	fs.StringVar(&config.Curve, "curve", "", "curve")
@@ -42,8 +40,14 @@ func parseConfig(args []string) (Config, error) {
 		return config, fmt.Errorf("unexpected positional arguments")
 	}
 
-	if config.Mode != "local" && config.Mode != "remote" {
-		return config, fmt.Errorf("mode must be explicit: local or remote")
+	serverProvided := false
+	fs.Visit(func(f *flag.Flag) {
+		if f.Name == "server" {
+			serverProvided = true
+		}
+	})
+	if serverProvided && strings.TrimSpace(config.Server) == "" {
+		return config, fmt.Errorf("--server requires a non-empty HOST:PORT")
 	}
 
 	if config.Backend == "" || config.Curve == "" || config.InputsFile == "" {
@@ -65,12 +69,5 @@ func parseConfig(args []string) (Config, error) {
 		return config, fmt.Errorf("--circuit-file does not accept --setup-name")
 	}
 
-	if config.Mode == "local" {
-		if config.Server != "" {
-			return config, fmt.Errorf("server is not used in local modes")
-		}
-	} else if config.Server == "" {
-		return config, fmt.Errorf("remote mode requires server address")
-	}
 	return config, nil
 }

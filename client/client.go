@@ -25,8 +25,8 @@ func main() {
 
 func run(cfg Config) error {
 	var result proving.Result
-	switch cfg.Mode {
-	case "local":
+	mode := "local"
+	if cfg.Server == "" {
 		job, err := LoadJob(cfg)
 		if err != nil {
 			return err
@@ -44,7 +44,8 @@ func run(cfg Config) error {
 		if err != nil {
 			return err
 		}
-	case "remote":
+	} else {
+		mode = "remote"
 		response, err := exchange(cfg)
 		if err != nil {
 			return err
@@ -52,7 +53,7 @@ func run(cfg Config) error {
 		result = proving.Result{Circuit: response.Circuit, Backend: response.Backend, Curve: response.Curve, Proof: response.Proof, PublicWitness: response.PublicWitness, VerifyingKey: response.VerifyingKey}
 	}
 	// Result stays in memory; forwarding to a verifier is the next stage.
-	fmt.Printf("Result (%s): proof", cfg.Mode)
+	fmt.Printf("Result (%s): proof", mode)
 	if result.Circuit != "" {
 		fmt.Printf("; circuit=%s", result.Circuit)
 	}
