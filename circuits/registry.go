@@ -8,7 +8,6 @@ import (
 	"bachelor/implementation/circuits/mimc"
 	"bachelor/implementation/circuits/pairing"
 	"bachelor/implementation/circuits/plonkexample"
-	"bachelor/implementation/circuits/print_constraints"
 	"bachelor/implementation/circuits/pubkeyhashing"
 	"bachelor/implementation/circuits/rollup"
 	"bachelor/implementation/circuits/sudoku"
@@ -33,7 +32,6 @@ var catalog = map[string]Constructor{
 	"witness":               witness.NewDefinition,
 	"plonk":                 plonkexample.NewDefinition,
 	"serialization":         gcubic.NewDefinition,
-	"print_constraints":     print_constraints.NewDefinition,
 	"inputpacking":          inputpacking.NewDefinition,
 	"inputpacking-unpacked": inputpacking.NewUnpackedDefinition,
 	"pubkeyhashing":         pubkeyhashing.NewDefinition,

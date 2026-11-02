@@ -95,7 +95,8 @@ func handleConnection(connection net.Conn) error {
 	}
 
 	if len(payload) > transport.MaxPayloadSize {
-		payload, err = codec.Encode(protocol.Response{Type: "error", Error: "encoded response exceeds single Noise frame; fragmentation is not implemented"})
+		runErr = fmt.Errorf("encoded response exceeds single Noise frame; fragmentation is not implemented")
+		payload, err = codec.Encode(protocol.Response{Type: "error", Error: runErr.Error()})
 		if err != nil {
 			return err
 		}
@@ -104,7 +105,7 @@ func handleConnection(connection net.Conn) error {
 		return fmt.Errorf("send response: %w", err)
 	}
 
-	return nil
+	return runErr
 }
 
 // handleProve converts a network request to the same job used by the local client.
