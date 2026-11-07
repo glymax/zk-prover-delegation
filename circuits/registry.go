@@ -1,17 +1,16 @@
 package circuits
 
 import (
-	gcubic "bachelor/implementation/circuits/cubic"
-	"bachelor/implementation/circuits/emulated"
+	"bachelor/implementation/circuits/cubic"
+	"bachelor/implementation/circuits/emulated-mul"
 	"bachelor/implementation/circuits/exponentiate"
 	"bachelor/implementation/circuits/inputpacking"
 	"bachelor/implementation/circuits/mimc"
 	"bachelor/implementation/circuits/pairing"
-	"bachelor/implementation/circuits/plonkexample"
-	"bachelor/implementation/circuits/pubkeyhashing"
-	"bachelor/implementation/circuits/rollup"
+	"bachelor/implementation/circuits/point-check"
+	"bachelor/implementation/circuits/sha256"
+	"bachelor/implementation/circuits/signature-hash-check"
 	"bachelor/implementation/circuits/sudoku"
-	"bachelor/implementation/circuits/witness"
 
 	"github.com/consensys/gnark/frontend"
 )
@@ -20,26 +19,22 @@ import (
 // It does not populate witness values.
 type Constructor func() frontend.Circuit
 
-// Catalog pins the example definitions locally. Serialization reuses local Cubic
-// just as the upstream example does. The GPU example's
-// pairing circuit runs on the current CPU Groth16 backend (no ICICLE required).
+// Catalog contains the fixed built-in circuit definitions.
 var catalog = map[string]Constructor{
-	"cubic":                 gcubic.NewDefinition,
+	"sha256":                sha256.NewDefinition,
+	"cubic":                 cubic.NewDefinition,
 	"exponentiate":          exponentiate.NewDefinition,
 	"mimc":                  mimc.NewDefinition,
-	"emulated":              emulated.NewDefinition,
+	"emulated-mul":          emulatedmul.NewDefinition,
 	"sudoku":                sudoku.NewDefinition,
-	"witness":               witness.NewDefinition,
-	"plonk":                 plonkexample.NewDefinition,
-	"serialization":         gcubic.NewDefinition,
-	"inputpacking":          inputpacking.NewDefinition,
+	"point-check":           pointcheck.NewDefinition,
+	"inputpacking-packed":   inputpacking.NewDefinition,
 	"inputpacking-unpacked": inputpacking.NewUnpackedDefinition,
-	"pubkeyhashing":         pubkeyhashing.NewDefinition,
-	"accelerated_gpu":       pairing.NewDefinition,
-	"rollup":                rollup.NewDefinition,
+	"signature-hash-check":  signaturehashcheck.NewDefinition,
+	"pairing":               pairing.NewDefinition,
 }
 
-// Built-in definitions currently have fixed shapes, including rollup's fixed paths.
+// Built-in definitions currently have fixed shapes, initialized by their constructors.
 func Lookup(name string) (Constructor, bool) {
 	constructor, ok := catalog[name]
 	return constructor, ok

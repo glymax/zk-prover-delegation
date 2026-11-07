@@ -1,5 +1,4 @@
-// Package transport carries framed Noise messages over an existing connection.
-package transport
+package protocol
 
 import (
 	"bytes"
@@ -13,33 +12,35 @@ import (
 
 // Session is sequential, owns cipher states, but does not own/close the connection.
 // After any I/O or decryption error the caller must close the connection.
-// NN does not authenticate peers; attestation is not implemented yet.
+// KK authenticates pinned peer keys; TEE attestation is not implemented yet.
 type Session struct {
 	connection    io.ReadWriter
 	send, receive *noise.CipherState
 	binding       []byte
 }
 
-// Client performs the initiating side of Noise_NN_25519_ChaChaPoly_SHA256.
-func Client(connection io.ReadWriter) (*Session, error) {
-	return handshake(connection, true)
+// Client performs the initiating side of Noise_KK_25519_ChaChaPoly_SHA256.
+func Client(connection io.ReadWriter, keys Keys) (*Session, error) {
+	return handshake(connection, true, keys)
 }
 
 // Server performs the responding side of the same handshake.
-func Server(connection io.ReadWriter) (*Session, error) {
-	return handshake(connection, false)
+func Server(connection io.ReadWriter, keys Keys) (*Session, error) {
+	return handshake(connection, false, keys)
 }
 
-func handshake(connection io.ReadWriter, initiator bool) (*Session, error) {
-	// NN generates fresh ephemeral key pairs inside the library; no static keys.
+func handshake(connection io.ReadWriter, initiator bool, keys Keys) (*Session, error) {
+	// Fresh ephemeral keys are generated for every session, alongside the static identity.
 	DHFunction := noise.DH25519
 	PRNG := rand.Reader
 	state, err := noise.NewHandshakeState(noise.Config{
-		CipherSuite: noise.NewCipherSuite(DHFunction, noise.CipherChaChaPoly, noise.HashSHA256),
-		Random:      PRNG,
-		Pattern:     noise.HandshakeNN,
-		Initiator:   initiator,
-		Prologue:    []byte("my_super_secret_prologue"),
+		CipherSuite:   noise.NewCipherSuite(DHFunction, noise.CipherChaChaPoly, noise.HashSHA256),
+		Random:        PRNG,
+		Pattern:       noise.HandshakeKK,
+		Initiator:     initiator,
+		StaticKeypair: keys.own,
+		PeerStatic:    keys.peer,
+		Prologue:      []byte("zk-prover-delegation/v1/client-server"),
 	})
 	if err != nil {
 		return nil, err
@@ -64,7 +65,7 @@ func handshake(connection io.ReadWriter, initiator bool) (*Session, error) {
 			}
 		}
 		if err != nil {
-			return nil, fmt.Errorf("noise NN message %d: %w", step+1, err)
+			return nil, fmt.Errorf("noise KK message %d: %w", step+1, err)
 		}
 	}
 	// Split returns initiator->responder first, responder->initiator second.

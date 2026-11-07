@@ -3,7 +3,6 @@ package main
 import (
 	"bachelor/implementation/codec"
 	"bachelor/implementation/protocol"
-	"bachelor/implementation/transport"
 	"bytes"
 	"crypto/rand"
 	"fmt"
@@ -14,6 +13,19 @@ import (
 
 func exchange(cfg Config) (protocol.Response, error) {
 
+	request, err := LoadRequest(cfg)
+	if err != nil {
+		return protocol.Response{}, err
+	}
+	payload, err := codec.Encode(request)
+	if err != nil {
+		return protocol.Response{}, err
+	}
+
+	keys, err := protocol.LoadKeys("client/keys/private.key", "client/keys/server.public.key")
+	if err != nil {
+		return protocol.Response{}, err
+	}
 	connection, err := net.DialTimeout("tcp", cfg.Server, 5*time.Second)
 	if err != nil {
 		return protocol.Response{}, fmt.Errorf("connect: %w", err)
@@ -31,11 +43,11 @@ func exchange(cfg Config) (protocol.Response, error) {
 	}
 
 	// Noise handshake
-	session, err := transport.Client(connection)
+	session, err := protocol.Client(connection, keys)
 	if err != nil {
 		return protocol.Response{}, fmt.Errorf("handshake: %w", err)
 	}
-	log.Print("Noise NN complete (peer identity not verified)")
+	log.Print("Noise KK complete (server authenticated by pinned key; TEE not verified)")
 
 	// Placeholder exchange on this exact Noise session. It does NOT verify a TEE.
 	var nonce [32]byte
@@ -63,19 +75,10 @@ func exchange(cfg Config) (protocol.Response, error) {
 	if report.Type != "attestation" || report.Status != "not_implemented" || !bytes.Equal(report.Nonce, nonce[:]) || report.Error != "" {
 		return protocol.Response{}, fmt.Errorf("unexpected attestation stub response")
 	}
-	log.Print("Attestation stub only: nonce echoed, no report or identity verification; continuing prototype")
+	log.Print("Attestation stub only: nonce echoed, no report or TEE verification; continuing prototype")
 
 	if err = connection.SetDeadline(time.Time{}); err != nil {
 		return protocol.Response{}, fmt.Errorf("set exchange deadline: %w", err)
-	}
-
-	request, err := LoadRequest(cfg)
-	if err != nil {
-		return protocol.Response{}, err
-	}
-	payload, err := codec.Encode(request)
-	if err != nil {
-		return protocol.Response{}, err
 	}
 
 	if err = session.Send(payload); err != nil {

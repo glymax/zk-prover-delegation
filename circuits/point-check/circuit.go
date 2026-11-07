@@ -1,6 +1,6 @@
 // Adapted from gnark v0.16.4 examples/witness/witness_test.go.
-// Copyright Consensys Software Inc. Licensed under Apache-2.0; see ../LICENSE.
-package witness
+// Copyright Consensys Software Inc. Licensed under Apache-2.0; see ../../docs/LICENSE.
+package pointcheck
 
 import (
 	"github.com/consensys/gnark/frontend"

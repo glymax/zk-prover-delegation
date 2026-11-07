@@ -1,5 +1,5 @@
 // Copied from gnark v0.16.4 examples/emulated/emulated.go.
-package emulated
+package emulatedmul
 
 import (
 	"github.com/consensys/gnark/frontend"
@@ -12,7 +12,7 @@ type Circuit struct {
 }
 
 func (circuit *Circuit) Define(api frontend.API) error {
-	// wrap API to work in SECP256k1 scalar field
+	// wrap API to work in secp256k1 base field
 	secp256k1, err := emulated.NewField[emulated.Secp256k1Fp](api)
 	if err != nil {
 		return err

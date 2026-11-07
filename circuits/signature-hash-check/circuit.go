@@ -1,6 +1,6 @@
 // Adapted from gnark v0.16.4 examples/pubkeyhashing/pubkeyhashing_test.go.
-// Copyright Consensys Software Inc. Licensed under Apache-2.0; see ../LICENSE.
-package pubkeyhashing
+// Copyright Consensys Software Inc. Licensed under Apache-2.0; see ../../docs/LICENSE.
+package signaturehashcheck
 
 import (
 	"fmt"
@@ -14,12 +14,13 @@ import (
 	"github.com/consensys/gnark/std/signature/ecdsa"
 )
 
-// PubkeySHA2 is a circuit that verifies ECDSA signature and checks that the
-// hash of the public key matches the expected hash.
+// Circuit verifies a secp256k1 ECDSA signature and the SHA-256 hash of its public key.
+// This BN254-oriented example assumes a 32-byte native field encoding when
+// unpacking PublicKeyHash; it is not portable to BW6-761 as written.
 //
 // The fields of the struct define the public and private inputs to the circuit.
-// The actual circuit is defined in the [PubKeySHA2.Define] method.
-type PubKeySHA2 struct {
+// The actual circuit is defined in the [Circuit.Define] method.
+type Circuit struct {
 	// PublicKeyHash is 32 bytes, but we split it into two 16-byte variables to fit into BN254 field
 	PublicKeyHash [2]frontend.Variable                                        `gnark:",public"`
 	Signature     ecdsa.Signature[emparams.Secp256k1Fr]                       `gnark:",public"`
@@ -27,7 +28,7 @@ type PubKeySHA2 struct {
 	PublicKey     ecdsa.PublicKey[emparams.Secp256k1Fp, emparams.Secp256k1Fr] // actual public key is also a private input
 }
 
-func (c *PubKeySHA2) Define(api frontend.API) error {
+func (c *Circuit) Define(api frontend.API) error {
 	// -- hash the given public key
 	//  - first we convert the public key coordinates to bytes
 	xbytes, err := conversion.EmulatedToBytes(api, &c.PublicKey.X)
@@ -80,5 +81,5 @@ func (c *PubKeySHA2) Define(api frontend.API) error {
 
 // NewDefinition initializes the fixed circuit shape.
 func NewDefinition() frontend.Circuit {
-	return &PubKeySHA2{}
+	return &Circuit{}
 }

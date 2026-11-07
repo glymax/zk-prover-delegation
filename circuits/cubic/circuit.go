@@ -1,6 +1,6 @@
 // Adapted from gnark v0.16.4 examples/cubic/cubic.go.
 // Copyright 2020-2025 Consensys Software Inc.
-// Licensed under the Apache License, Version 2.0. See ../LICENSE for details.
+// Licensed under the Apache License, Version 2.0. See ../../docs/LICENSE for details.
 
 package cubic
 

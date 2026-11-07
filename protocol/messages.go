@@ -1,4 +1,4 @@
-// Package protocol defines CBOR network messages, without gnark.
+// Package protocol provides authenticated Noise sessions and CBOR network messages, without gnark.
 package protocol
 
 type Request struct {

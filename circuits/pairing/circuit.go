@@ -1,5 +1,5 @@
 // Adapted from gnark v0.16.4 examples/accelerated_gpu/accelerated_gpu_example_test.go.
-// Copyright Consensys Software Inc. Licensed under Apache-2.0; see ../LICENSE.
+// Copyright Consensys Software Inc. Licensed under Apache-2.0; see ../../docs/LICENSE.
 package pairing
 
 import (
@@ -24,14 +24,6 @@ func (c *ExampleCircuit) Define(api frontend.API) error {
 	}
 	pr.AssertIsEqual(res, &c.Res)
 
-	// we have commented out another option for the circuit implementation for
-	// faster testing. Comment the previous part and uncomment the following to
-	// use it.
-
-	// api.AssertIsDifferent(c.Res.A0.Limbs[0], 0) // dummy constraint to avoid empty circuit
-	// api.AssertIsDifferent(c.Res.A0.Limbs[1], 0)
-	// api.AssertIsDifferent(c.Res.A0.Limbs[2], 0)
-	// api.AssertIsDifferent(c.Res.A0.Limbs[3], 0)
 	return nil
 }
 

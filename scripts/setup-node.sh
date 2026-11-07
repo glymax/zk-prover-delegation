@@ -29,7 +29,7 @@ EOF
 }
 
 profile_content() {
-    printf '# Managed by bachelor implementation/scripts/setup-node.sh\n'
+    printf '# Managed by zk-prover-delegation/scripts/setup-node.sh\n'
     printf 'export PATH="%s/bin:$PATH"\n' "$GO_DIR"
     # Keep Go from silently downloading a different toolchain for a module.
     printf 'export GOTOOLCHAIN=local\n'

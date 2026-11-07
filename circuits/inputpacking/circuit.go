@@ -1,5 +1,5 @@
 // Adapted from gnark v0.16.4 examples/inputpacking/inputpacking_test.go.
-// Copyright Consensys Software Inc. Licensed under Apache-2.0; see ../LICENSE.
+// Copyright Consensys Software Inc. Licensed under Apache-2.0; see ../../docs/LICENSE.
 // Adaptation: use supported secret tags and expose PublicHash as intended by the example.
 package inputpacking
 

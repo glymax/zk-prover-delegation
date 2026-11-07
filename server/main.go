@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bachelor/implementation/protocol"
 	"flag"
 	"fmt"
 	"log"
@@ -16,12 +17,16 @@ func main() {
 	if flag.NArg() != 0 {
 		log.Fatal("unexpected positional arguments")
 	}
-	if err := run(*address); err != nil {
+	keys, err := protocol.LoadKeys("server/keys/private.key", "server/keys/client.public.key")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := run(*address, keys); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(address string) error {
+func run(address string, keys protocol.Keys) error {
 	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		return fmt.Errorf("listen: %w", err)
@@ -31,11 +36,11 @@ func run(address string) error {
 			log.Printf("Close listener: %v", closeErr)
 		}
 	}()
-	log.Printf("Listening on %s (Noise NN, CBOR messages; peer identity not verified)", listener.Addr())
+	log.Printf("Listening on %s (Noise KK, CBOR messages; pinned client key required)", listener.Addr())
 
 	connection, err := listener.Accept()
 	if err != nil {
 		return fmt.Errorf("accept: %w", err)
 	}
-	return handleConnection(connection)
+	return handleConnection(connection, keys)
 }

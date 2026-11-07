@@ -7,9 +7,10 @@ import (
 
 func printUsage(fs *flag.FlagSet) {
 	fmt.Fprint(fs.Output(), `Usage: client [--server HOST:PORT] ...   (-h or --help)
-Run from the implementation directory.
+Run from the project root directory.
 Specify exactly one of --circuit NAME and --circuit-file PATH.
 Without --server, proving runs locally. --circuit-file requires a fresh setup.
+Remote keys are loaded from client/keys/private.key and client/keys/server.public.key.
 Input and source file paths refer to the client machine; remote circuit and setup names refer to the server.
 
 1. Local, built-in circuit

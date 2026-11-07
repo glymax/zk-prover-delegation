@@ -6,14 +6,13 @@ import (
 	"bachelor/implementation/proving"
 	"bachelor/implementation/proving/worker"
 	"bachelor/implementation/server/attestation"
-	"bachelor/implementation/transport"
 	"fmt"
 	"log"
 	"net"
 	"time"
 )
 
-func handleConnection(connection net.Conn) error {
+func handleConnection(connection net.Conn, keys protocol.Keys) error {
 	defer func() {
 		closeErr := connection.Close()
 		if closeErr != nil {
@@ -26,7 +25,7 @@ func handleConnection(connection net.Conn) error {
 	}
 
 	// Noise handshake
-	session, err := transport.Server(connection)
+	session, err := protocol.Server(connection, keys)
 
 	if err != nil {
 		return fmt.Errorf("handshake: %w", err)
@@ -94,7 +93,7 @@ func handleConnection(connection net.Conn) error {
 		return fmt.Errorf("encode response: %w", err)
 	}
 
-	if len(payload) > transport.MaxPayloadSize {
+	if len(payload) > protocol.MaxPayloadSize {
 		runErr = fmt.Errorf("encoded response exceeds single Noise frame; fragmentation is not implemented")
 		payload, err = codec.Encode(protocol.Response{Type: "error", Error: runErr.Error()})
 		if err != nil {

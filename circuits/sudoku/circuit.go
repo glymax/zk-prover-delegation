@@ -1,5 +1,5 @@
 // Adapted from gnark v0.16.4 examples/sudoku/sudoku_example_test.go.
-// Copyright Consensys Software Inc. Licensed under Apache-2.0; see ../LICENSE.
+// Copyright Consensys Software Inc. Licensed under Apache-2.0; see ../../docs/LICENSE.
 package sudoku
 
 import (

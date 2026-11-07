@@ -16,7 +16,7 @@ type SetupConfig struct {
 
 func parseConfig(args []string) (SetupConfig, error) {
 	var setupConfig SetupConfig
-	fs := flag.NewFlagSet("prepare", flag.ContinueOnError)
+	fs := flag.NewFlagSet("setupgen", flag.ContinueOnError)
 	fs.StringVar(&setupConfig.Circuit, "circuit", "", "fixed built-in circuit ID")
 	fs.StringVar(&setupConfig.Backend, "backend", "", "backend groth16 or plonk")
 	fs.StringVar(&setupConfig.Curve, "curve", "", "curve bn254, bls12-377, bls12-381 or bw6-761")

@@ -17,7 +17,7 @@ func main() {
 	} else if len(os.Args) == 2 && (os.Args[1] == "--help" || os.Args[1] == "-h") {
 		fmt.Println("prover: read one Job from stdin and write one Result to stdout.")
 	} else {
-		err = fmt.Errorf("expected no arguments (stdin job); use bin/prepare to create saved setups")
+		err = fmt.Errorf("expected no arguments (stdin job); use bin/setupgen to create saved setups")
 	}
 	if err != nil {
 		log.Fatal(err)
